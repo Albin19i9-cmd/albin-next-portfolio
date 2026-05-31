@@ -17,16 +17,22 @@ export function ContactForm() {
     const formData = new FormData(form);
 
     try {
-      const response = await fetch("/api/contact", {
+      const response = await fetch("https://formsubmit.co/ajax/albinsam1999@gmail.com", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify({
           name: formData.get("name"),
           email: formData.get("email"),
           company: formData.get("company"),
           message: formData.get("message"),
+          _replyto: formData.get("email"),
+          _subject: `Portfolio contact from ${formData.get("name")}`,
+          _template: "table",
+          _captcha: "false",
+          _url: "https://albin-next-portfolio.vercel.app/#contact",
         }),
       });
 
