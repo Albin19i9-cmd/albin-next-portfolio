@@ -43,22 +43,35 @@ export async function POST(request: Request) {
     submittedAt: new Date().toISOString(),
   };
 
-  if (process.env.CONTACT_WEBHOOK_URL) {
-    const webhookResponse = await fetch(process.env.CONTACT_WEBHOOK_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(contact),
-    });
+  const formSubmitTarget =
+    process.env.CONTACT_WEBHOOK_URL || "https://formsubmit.co/ajax/albinsam1999@gmail.com";
 
-    if (!webhookResponse.ok) {
-      return NextResponse.json(
-        { message: "Message received, but the notification service is unavailable." },
-        { status: 502 },
-      );
-    }
-  } else {
-    console.info("Portfolio contact submission", contact);
+  const webhookResponse = await fetch(formSubmitTarget, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      name,
+      email,
+      company,
+      message,
+      _replyto: email,
+      _subject: `Portfolio contact from ${name}`,
+      _template: "table",
+      _captcha: "false",
+    }),
+  });
+
+  if (!webhookResponse.ok) {
+    return NextResponse.json(
+      { message: "Message received, but the email notification service is unavailable." },
+      { status: 502 },
+    );
   }
+
+  console.info("Portfolio contact submission", contact);
 
   return NextResponse.json({ message: "Message sent. I will get back to you soon." });
 }
